@@ -27,7 +27,7 @@ t_stack* newStack(){                // cria uma nova stack
 }
 
 
-void pushTop(t_stack* l, char data){     // insere novo elemento no toppo da stack. O(1).
+void push(t_stack* l, char data){     // insere novo elemento no toppo da stack. O(1).
     t_elemento* n = (t_elemento*) malloc(sizeof(t_elemento));	// atualiza os ponteiros da lista.
 	n->data = data;
 	n->prox = l->inicio;
@@ -41,8 +41,8 @@ char top(t_stack* stack){            // acessa o topo da stack sem remove-lo. O(
     return stack->inicio->data;    
 }
 
-char popTop(t_stack* l){     // remove o topo da stack. O(1).
-    	if(l->inicio == NULL) return -1;	// faz o handling da memoria para evitar vazamentos.
+char pop(t_stack* l){     // remove o topo da stack. O(1).
+    	if(l->inicio == NULL) return 'e';	// faz o handling da memoria para evitar vazamentos.
 										// retorna o valor do elemento que foi deletado.
 	char tmp = l->inicio->data;
 	t_elemento* t = l->inicio;
