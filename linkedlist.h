@@ -5,7 +5,8 @@
 #include <stdlib.h>
 
 //typedef struct elemento{									// as declarações de elemento e lista estão comentadas porque
-//	char data;												// estao no arquivo stack.h ... estava dando erro de compilação.
+//	char data;		
+// int prioridade										// estao no arquivo stack.h ... estava dando erro de compilação.
 //	struct elemento* prox;
 //} t_elemento;
 
@@ -27,6 +28,23 @@ t_lista* newList(){											// cria nova lista e retorna o ponteiro para ela
 void insertInicio(t_lista* l, char data){						// insere um elemento no inicio da lista. O(1).
 	t_elemento* n = (t_elemento*) malloc(sizeof(t_elemento));	// atualiza os ponteiros da lista.
 	n->data = data;
+
+	// acertando a prioridade: operandos = 1000, + - = 0, * / = 1, () = 3. caracteres invalidos = 5.
+	if(isdigit(data)){
+		n->prioridade = 1000;
+	}
+	else if((data == '+') || (data == '-')){	// parentesis tem uma prioridade menor no codigo para nao serem removidos da stack de operadores
+		n->prioridade = 1;						// pelos operadores que vao entre eles.
+	}
+	else if((data == '*') || (data == '/')){
+		n->prioridade = 2;
+	}
+	else if((data == '(') || (data == ')')){
+		n->prioridade = 0;
+	}
+	else{						// default para caracteres invalidos.
+		n->prioridade = 5;
+	}
 	n->prox = l->inicio;
 	l->inicio = n;
 	l->size += 1;
@@ -41,7 +59,7 @@ void printList(t_lista* l){				// mostra na tela os conteúdos da lista toda. O(
 	} 		
 	t_elemento* curr = l->inicio;
 	while(curr != NULL){
-		printf("%c ", curr->data);
+		printf("%c", curr->data);
 		curr = curr->prox;
 	}
 	printf("\n");
@@ -49,6 +67,24 @@ void printList(t_lista* l){				// mostra na tela os conteúdos da lista toda. O(
 void insertFim(t_lista* l, char data){							// insere um elemento no final da lista. O(1).
 	t_elemento* e = (t_elemento*) malloc(sizeof(t_elemento));	// atualiza os ponteiros da lista.
 	e->data = data;
+
+	// acertando a prioridade: operandos = 1000, + - = 0, * / = 1, () = 3. caracteres invalidos = 5.
+	if(isdigit(data)){
+		e->prioridade = 1000;
+	}
+	else if((data == '+') || (data == '-')){		// parentesis tem uma prioridade menor no codigo para nao serem removidos da stack de operadores
+		e->prioridade = 1;							// pelos operadores que vao entre eles.
+	}
+	else if((data == '*') || (data == '/')){
+		e->prioridade = 2;
+	}
+	else if((data == '(') || (data == ')')){
+		e->prioridade = 0;
+	}
+	else{						// default para caracteres invalidos.
+		e->prioridade = 5;
+	}
+
 	e->prox = NULL;
 	if(l->fim != NULL)
 		l->fim->prox = e;
