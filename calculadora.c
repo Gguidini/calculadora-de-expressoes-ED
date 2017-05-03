@@ -8,11 +8,19 @@
 int errorCheck(t_lista* l){			// função faz validacao da expressao pelos parentesis. 1 = erro; 0 = tudo ok.
 	t_elemento* it = l->inicio;		// armazena os parentesis de abertura na stack e remove quando encontra um de fechamento			
 	t_stack* err = newStack(); 
+	int b = 0;	// flag de numeros
 	while(it != NULL){
-		if(it->data == '('){
+		if(isdigit(it->data)){
+			b = 1;
+		}
+		
+		else if(it->prioridade == 5){	// flag para caracteres invalidos (letras)
+			return 3;
+		}
+		else if(it->data == '('){
 			push(err, it->data);
 		}
-		if(it->data == ')'){
+		else if(it->data == ')'){
 			if(!isStackEmpty(err)){
 				pop(err);
 			}
@@ -24,6 +32,10 @@ int errorCheck(t_lista* l){			// função faz validacao da expressao pelos paren
 
 		it = it->prox;
 	}
+	if(b == 0){		// significa que nao ha nenhum numero na expressao
+		return 2;
+	}
+	
 	if(!isStackEmpty(err))	// se a stack nao estiver vazia neste ponto, significa erro.
 	return 1;
 
@@ -75,12 +87,20 @@ t_lista* inToPos(t_lista* l){
 	t_stack* aux = newStack();
 	t_lista* nova = newList();
 	t_elemento* it = l->inicio;
+	
+	int b = 1; // marcador de numeros
 	while(it != NULL){
 		if(isdigit(it->data)){
 			// digitos sao adicionados diretamente para a saida
+			if(b == 0){
+				insertFim(nova, ' ');
+			}
+			b = 1;
 			insertFim(nova, it->data);
+			
 		}
 		else{
+			b = 0;
 				// operandos e parentesis
 				if((it->data == '(') || (it->data == ')')){
 					if(it->data == '('){
@@ -123,7 +143,15 @@ t_lista* inToPos(t_lista* l){
 	return nova;
 }
 
+void showHelp(){	// mostra as regras de formatacao e operacoes disponiveis.
+	printf("* CALCULADORA DE EXPRESSOES *\n");
+	printf("Operaçoes Disponiveis:\n- adicao (+)\n-subtracao (-)\n");
+	printf("-multiplicacao (*)\n-divisao (/)\n\n");
+	printf("INSIRA SOMENTE NUMEROS E OPERANDOS. INCOGNITAS NAO SAO ACEITAS.\n");
+
+}
 int main(){
+	showHelp();
 	t_lista* l = readInput();	// stack para armazenar entrada inicial. 
 	int b = 0;	// entrar no loop forcado.
 	while(b == 0){			// loop permite que input possa ser recolocado, caso haja erro, sem reiniciar o programa.
@@ -137,7 +165,14 @@ int main(){
 			printList(l);
 		}
 		else{
+			if(b == 1)
 			printf("expressao apresenta erros.\n");
+			
+			else if(b == 2)
+			printf("expressao sem numeros.\n");
+			
+			else
+			printf("expressao apresenta caractere invalido\n");
 		}
 		b = getB();
 		if(b == 1){		
