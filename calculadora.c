@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "linkedlist.h"
 
-int errorCheck(t_lista* l){			// função faz validacao da expressao pelos parentesis. 1 = erro; 0 = tudo ok.
+int errorCheck(t_lista* l){			// função faz validacao da expressao pelos parentesis. 1, 2, 3 = erro; 0 = tudo ok.
 	t_elemento* it = l->inicio;		// armazena os parentesis de abertura na stack e remove quando encontra um de fechamento			
 	t_stack* err = newStack(); 
 	int b = 0;	// flag de numeros
@@ -16,6 +16,10 @@ int errorCheck(t_lista* l){			// função faz validacao da expressao pelos paren
 		
 		else if(it->prioridade == 5){	// flag para caracteres invalidos (letras)
 			return 3;
+		}
+		else if((it->prioridade == 1) || (it->prioridade == 2)){ // operadores seguidos
+			if((it->prox->prioridade == 1) || (it->prox->prioridade == 2))
+			return 1;
 		}
 		else if(it->data == '('){
 			push(err, it->data);
@@ -171,7 +175,7 @@ int main(){
 			else if(b == 2)
 			printf("expressao sem numeros.\n");
 			
-			else
+			else if(b == 3)
 			printf("expressao apresenta caractere invalido\n");
 		}
 		b = getB();
