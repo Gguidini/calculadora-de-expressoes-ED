@@ -91,7 +91,7 @@ t_lista* inToPos(t_lista* l){
 	t_stack* aux = newStack();
 	t_lista* nova = newList();
 	t_elemento* it = l->inicio;
-	
+	char prev;
 	int b = 1; // marcador de numeros
 	while(it != NULL){
 		if(isdigit(it->data)){
@@ -124,6 +124,11 @@ t_lista* inToPos(t_lista* l){
 					push(aux, it->data);
 				}
 				else if(top(aux)->prioridade < it->prioridade){
+					if(it->data == '-' && prev == '('){
+						insertFim(nova, '@');
+						it = it->prox;
+						continue;
+					}
 					push(aux, it->data);
 				}
 				else{
@@ -136,7 +141,9 @@ t_lista* inToPos(t_lista* l){
 				}
 			}
 		}
+		prev = it->data;
 		it = it->prox;
+		
 	}
 	while(!isStackEmpty(aux)){
 		insertFim(nova, top(aux)->data);
@@ -233,7 +240,10 @@ int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
 			double b = sec->frac;
 			double a = 0;
 			if(pri != NULL){
-				a = pri->frac;
+				if(pri->field == 'i')
+					a = pri->whole;
+				else
+					a = pri->frac;
 			}
 			
 			char f = 'd';
