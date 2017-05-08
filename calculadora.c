@@ -17,10 +17,10 @@ int errorCheck(t_lista* l){			// função faz validacao da expressao pelos paren
 		else if(it->prioridade == 5){	// flag para caracteres invalidos (letras)
 			return 3;
 		}
-		else if((it->prioridade == 1) || (it->prioridade == 2)){ // operadores seguidos
-			if((it->prox->prioridade == 1) || (it->prox->prioridade == 2))
-			return 1;
-		}
+		//else if((it->prioridade == 1) || (it->prioridade == 2)){ // operadores seguidos
+		//	if((it->prox->prioridade == 1) || (it->prox->prioridade == 2))
+		//	return 1;
+		//}
 		else if(it->data == '('){
 			push(err, it->data);
 		}
@@ -91,7 +91,7 @@ t_lista* inToPos(t_lista* l){
 	t_stack* aux = newStack();
 	t_lista* nova = newList();
 	t_elemento* it = l->inicio;
-	char prev;
+	t_elemento* prev;
 	int b = 1; // marcador de numeros
 	while(it != NULL){
 		if(isdigit(it->data)){
@@ -120,15 +120,19 @@ t_lista* inToPos(t_lista* l){
 					}
 				}
 				else{
-				if(isStackEmpty(aux)){
+					
+				if(it != l->inicio){
+					if(it->data == '-' && (prev->data == '(' || (prev->prioridade == 1) || (prev->prioridade == 2))){
+							push(aux, '@');
+					}
+					else if(it->data == '+' && (prev->data == '(' || (prev->prioridade == 1) || (prev->prioridade == 2))){
+						// faz nada
+					}
+					else if(isStackEmpty(aux)){
 					push(aux, it->data);
 				}
 				else if(top(aux)->prioridade < it->prioridade){
-					if(it->data == '-' && prev == '('){
-						insertFim(nova, '@');
-						it = it->prox;
-						continue;
-					}
+					
 					push(aux, it->data);
 				}
 				else{
@@ -139,9 +143,17 @@ t_lista* inToPos(t_lista* l){
 
 					push(aux, it->data);
 				}
+				}
+				else if(it->data == '-' && it == l->inicio){
+					push(aux, '@');
+				}
+				else if(it->data == '+' && it == l->inicio){
+					// faz nada
+				}
+				
 			}
 		}
-		prev = it->data;
+		prev = it;
 		it = it->prox;
 		
 	}
@@ -298,6 +310,15 @@ void Resolve(t_lista* l)
             	i = 0;
             	num1[0] = '\0';
             }
+            else if(curr->data == '@' && prev == '@'){
+            	t_numero* n = jooj->inicio;
+            	if(n->field == 'i'){
+            		n->whole = n->whole * (-1);
+            	}
+            	else{
+            		n->frac = n->frac * (-1.0);
+            	}
+            }
             else if(!isdigit(curr->data)){
             	i = 0;
             }
@@ -346,11 +367,8 @@ int main(){
 		b = errorCheck(l);
 		if(b == 0){	
 			// tudo certo, prosseguir processamento
-			printf("processar...\n");
+			printf("expressao aceita.\n");
 			l = inToPos(l);
-			printf("posfixa: ");
-			printList(l);
-			
 			Resolve(l);
 		}
 		else{
