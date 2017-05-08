@@ -288,7 +288,7 @@ void Resolve(t_lista* l)
             	i = 0;
             	num1[0] = '\0';
             }
-            else{
+            else if(!isdigit(curr->data)){
             	i = 0;
             }
         }
