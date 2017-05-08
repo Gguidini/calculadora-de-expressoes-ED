@@ -147,6 +147,179 @@ t_lista* inToPos(t_lista* l){
 	return nova;
 }
 
+ 
+int strLen(char* ch)	// tamanho do numero
+{
+    int i;
+    int count = 0;
+    for(i = 0; ch[i] != '\0' ;i++)
+        count++;
+    return count;
+}
+ 
+long long charToInt (char* ch)	// transforma numero para inteiro
+{
+    int tam = strLen(ch)-2;
+    int i;
+    long long int sum = 0;
+    for(i = 0 ; ch[i] != '\0' ;i++)
+    {
+    	if((ch[i] != ' ') && (ch[i] != '@')){
+        int dec = (int) pow(10, tam);
+        int num = ch[i] - '0' ;
+        sum += (num * dec);
+        tam -= 1;
+    	}
+    	else if(ch[i] == '@'){
+    		sum *= (-1);
+    	}
+    }
+    return sum;
+}
+ 
+int abs(int a){
+	return (a >= 0 ? a : (0 - a));
+}
+int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
+{	// retorna 0 se sucesso, 1 se fracasso.
+	t_numero* sec = numTop(jooj);
+	popNum(jooj);
+	t_numero* pri = numTop(jooj);
+	popNum(jooj);
+	
+	if((field == 'i') && (op != '/')){
+		int b = sec->whole;
+		int a = 0;
+		if(pri != NULL)
+			a = pri->whole;
+		
+		int c;
+		char f = 'i';
+		
+		
+	if(op == '+') c = a + b;
+    else if(op == '-') c = a - b;
+    else c = a * b;
+    
+        if(c > 1e9+7)
+    {
+        printf("---OVERFLOW!---\n");
+        return 1;
+    }
+    
+    pushNum(jooj, c, 0, f);
+	}
+	else{
+		if(field == 'i'){
+			double b = (double) sec->whole;
+			double a = 0;
+			
+			if(pri != NULL)
+			a = (double) pri->whole;
+		
+		
+		char f = 'd';
+		double c;
+		
+		if(b == 0)
+        {
+            printf("---DIVISAO POR ZERO!---\n");
+            return 1;
+        }
+        c = a / b;
+        pushNum(jooj, 0, c, f);
+		}
+		else{
+			double b = sec->frac;
+			double a = 0;
+			if(pri != NULL){
+				a = pri->frac;
+			}
+			
+			char f = 'd';
+			double c;
+			
+			if(op == '+') c = a + b;
+    		else if(op == '-') c = a - b;
+    		else if(op == '*') c = a * b;
+    		else
+    {
+        if(b == 0)
+        {
+            printf("---DIVISAO POR ZERO!---\n");
+            return 1;
+        }
+         c = a / b;
+         
+            if(c > 1e9+7)
+    {
+        printf("---OVERFLOW!---\n");
+        return 1;
+    }
+
+    }
+    		pushNum(jooj, 0, c, f);
+		}
+	}
+   
+    return 0;
+}
+ 
+void Resolve(t_lista* l)
+{
+    t_numStack* jooj = newNumStack();
+    t_elemento* curr = l->inicio;
+    char num1[11];		// primeiro numero
+    int i = 0;
+    char prev;
+    num1[0] = '\0';
+    
+    if(curr->data == ' ') curr = curr->prox;
+    while(curr)
+    {
+        if((isdigit(curr->data)) || (curr->data == ' ') || (curr->data == '@'))
+        {
+            num1[i++] = curr->data;
+            
+            if(((curr->data == ' ') || (curr->data == '@')) && (isdigit(prev))){
+            	num1[i] = '\0';
+            	int a = charToInt(num1);
+            	pushNum(jooj, a, 0, 'i');
+            	i = 0;
+            	num1[0] = '\0';
+            }
+            else{
+            	i = 0;
+            }
+        }
+        else
+        {
+        		if(isdigit(prev)){
+        		num1[i++] = ' ';
+        		num1[i] = '\0';
+            	int a = charToInt(num1);
+            	pushNum(jooj, a, 0, 'i');
+            	i = 0;
+            	num1[0] = '\0';
+        		}	
+            char f = numTop(jooj)->field;
+            if(Operacao(jooj, curr->data, f)) return;	// se Operacao retornar 1 conte esta com problema
+        }
+        prev = curr->data;
+        curr = curr->prox;
+    }
+    printf("Resultado = ");
+    t_numero* r = numTop(jooj);
+    if(r->field == 'd'){
+    	printf("%lf", r->frac);
+    }
+    else{
+    	printf("%d", r->whole);
+    }
+    printf("\n");
+}
+ 
+
 void showHelp(){	// mostra as regras de formatacao e operacoes disponiveis.
 	printf("* CALCULADORA DE EXPRESSOES *\n");
 	printf("Operaçoes Disponiveis:\n- adicao (+)\n-subtracao (-)\n");
@@ -167,6 +340,8 @@ int main(){
 			l = inToPos(l);
 			printf("posfixa: ");
 			printList(l);
+			
+			Resolve(l);
 		}
 		else{
 			if(b == 1)
