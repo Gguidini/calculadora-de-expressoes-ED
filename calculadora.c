@@ -17,10 +17,6 @@ int errorCheck(t_lista* l){			// função faz validacao da expressao pelos paren
 		else if(it->prioridade == 5){	// flag para caracteres invalidos (letras)
 			return 3;
 		}
-		//else if((it->prioridade == 1) || (it->prioridade == 2)){ // operadores seguidos
-		//	if((it->prox->prioridade == 1) || (it->prox->prioridade == 2))
-		//	return 1;
-		//}
 		else if(it->data == '('){
 			push(err, it->data);
 		}
@@ -287,11 +283,11 @@ int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
     return 0;
 }
  
-void Resolve(t_lista* l)
+void Resolve(t_lista* l)	// decide as operacoes. Separa numeros.
 {
     t_numStack* jooj = newNumStack();
     t_elemento* curr = l->inicio;
-    char num1[11];		// primeiro numero
+    char num1[11];		// armazena o numero
     int i = 0;
     char prev;
     num1[0] = '\0';
@@ -339,7 +335,7 @@ void Resolve(t_lista* l)
         prev = curr->data;
         curr = curr->prox;
     }
-    printf("Resultado = ");
+    printf("Resultado = ");		// mostrar o resultado
     t_numero* r = numTop(jooj);
     if(r->field == 'd'){
     	printf("%lf", r->frac);
@@ -348,6 +344,7 @@ void Resolve(t_lista* l)
     	printf("%d", r->whole);
     }
     printf("\n");
+    clearList(l);	// evita memory leak
 }
  
 
