@@ -198,16 +198,25 @@ int abs(int a){
 int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
 {	// retorna 0 se sucesso, 1 se fracasso.
 	t_numero* sec = numTop(jooj);
+	int sec_whole = sec->whole;
+	double sec_frac = sec->frac;
 	popNum(jooj);
 	t_numero* pri = numTop(jooj);
+	char pri_field = pri->field;
+	int pri_whole = pri->whole;
+	double pri_frac = pri->frac;
 	popNum(jooj);
 	
 	if((field == 'i') && (op != '/')){
-		int b = sec->whole;
+		int b = sec_whole;
 		int a = 0;
-		if(pri != NULL)
-			a = pri->whole;
-		
+		if(pri != NULL){
+			if(pri_field == 'i')
+			a = pri_whole;
+			
+			else
+			a = (int) pri_frac;
+		}
 		int c;
 		char f = 'i';
 		
@@ -226,11 +235,17 @@ int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
 	}
 	else{
 		if(field == 'i'){
-			double b = (double) sec->whole;
+			double b = (double) sec_whole;
 			double a = 0;
 			
 			if(pri != NULL)
-			a = (double) pri->whole;
+				if(pri != NULL){
+				if(pri_field == 'i')
+				a = pri_whole;
+				
+				else
+				a = (int) pri_frac;
+			}
 		
 		
 		char f = 'd';
@@ -245,13 +260,13 @@ int Operacao(t_numStack* jooj, char op, char field)	// executa as operacoes
         pushNum(jooj, 0, c, f);
 		}
 		else{
-			double b = sec->frac;
+			double b = sec_frac;
 			double a = 0;
 			if(pri != NULL){
 				if(pri->field == 'i')
-					a = pri->whole;
+					a = pri_whole;
 				else
-					a = pri->frac;
+					a = pri_frac;
 			}
 			
 			char f = 'd';
@@ -366,6 +381,8 @@ int main(){
 			// tudo certo, prosseguir processamento
 			printf("expressao aceita.\n");
 			l = inToPos(l);
+			printf("posfixa: ");
+			printList(l);
 			Resolve(l);
 		}
 		else{
